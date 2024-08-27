@@ -1,0 +1,73 @@
+{
+  "name": "self-order-kiosk-main",
+  "proxy": "http://127.0.0.1:5000",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
+    "@material-ui/lab": "^4.0.0-alpha.61",
+    "@mui/core": "^5.0.0-alpha.54",
+    "@mui/lab": "^5.0.0-alpha.172",
+    "@mui/material": "^5.16.5",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "axios": "^0.21.4",
+    "classnames": "^2.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.6.0",
+    "express": "^4.19.2",
+    "https": "^1.0.0",
+    "mongoo": "^0.3.5",
+    "mongoose": "^5.13.22",
+    "nfc-pcsc": "^0.8.1",
+    "nfc-reader": "^1.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-native-nfc-manager": "^3.15.1",
+    "react-redux": "^9.1.2",
+    "react-router-dom": "^5.3.4",
+    "react-scripts": "4.0.1",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "web-vitals": "^0.2.4",
+    "ws": "^8.18.0"
+  },
+  "scripts": {
+    "server": "nodemon --watch server.js --exec node server.js",
+    "start": "set BROWSER=chrome && react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint . --fix"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.7",
+    "@babel/preset-env": "^7.25.0",
+    "babel-jest": "^26.6.3",
+    "eslint": "^9.9.1",
+    "nodemon": "^2.0.22"
+  }
+}

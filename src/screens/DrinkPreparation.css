@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One:wght@400&display=swap');
+
+.drink-preparation-container {
+  background: url('../imagess/coffee-pouring.jpg') no-repeat center center;
+  background-size: cover;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Poziționează textul sus și spinnerul jos */
+  align-items: center;
+  padding: 20px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1; /* Ocupă spațiu disponibil între partea de sus și de jos */
+}
+
+.preparing-text {
+  font-family: 'Alfa Slab One', cursive;
+  font-size: 30px; /* Ajustează dimensiunea textului */
+  color: #ffffff; /* Culoarea textului */
+  text-transform: uppercase;
+  text-align: center; /* Centrează textul orizontal */
+  animation: waviy 1.5s infinite; /* Aplica animația de mișcare */
+  margin-top: -300px;
+}
+
+.drink-name {
+  color: #ff0000; /* Culoarea roșie pentru numele băuturii */
+  font-weight: 50; /* Font foarte subțire */
+  font-style: italic; /* Font înclinat */
+}
+
+.spinner {
+  width: 90px; /* Ajustează dimensiunea GIF-ului */
+  height: auto;
+  margin-bottom: 50px; /* Spațiu sub spinner */
+}
+
+@keyframes waviy {
+  0%, 40%, 100% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-20px);
+  }
+}
