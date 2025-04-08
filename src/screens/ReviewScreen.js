@@ -29,7 +29,16 @@ export default function ReviewScreen() {
   const [isOpen, setIsOpen] = useState(false);
   const [item, setItem] = useState({});
 
-  const closeHandler = () => {
+  const addToOrderHandler = () => {
+    const existingItem = orderItems.find((x) => x.name === item.name);
+    
+    if (existingItem) {
+      const updatedItem = { ...existingItem, quantity };
+      addToOrder(dispatch, updatedItem);
+    } else {
+      addToOrder(dispatch, { ...item, quantity });
+    }
+    
     setIsOpen(false);
   };
 
@@ -39,9 +48,9 @@ export default function ReviewScreen() {
     setIsOpen(true);
   };
 
-  const addToOrderHandler = () => {
-    addToOrder(dispatch, { ...item, quantity });
+  const closeHandler = () => {
     setIsOpen(false);
+    setQuantity(1);
   };
 
   const cancelOrRemoveFromOrder = () => {
@@ -57,10 +66,18 @@ export default function ReviewScreen() {
 
   return (
     <Box className={styles.root}>
-      <Box className={[styles.main, styles.navy, styles.center].join(' ')}>
+      <Box className={[styles.main, styles.navy].join(' ')}>
+        {/* Muta acest bloc mai sus */}
+        <Box className={[styles.top, styles.column].join(' ')}>
+          <Logo large />
+          <Typography gutterBottom className={styles.top} variant="h3" component="h3">
+            Comanda dumneavoastră
+          </Typography>
+        </Box>
+
         <Dialog maxWidth="sm" fullWidth={true} open={isOpen} onClose={closeHandler}>
           <DialogTitle className={styles.center}>
-            Adauga {item.name}
+            Editeaza {item.name}
           </DialogTitle>
           <Box className={[styles.row, styles.center].join(' ')}>
             <Button
@@ -73,12 +90,6 @@ export default function ReviewScreen() {
             </Button>
             <TextField
               inputProps={{ className: styles.largeInput }}
-              InputProps={{
-                bar: true,
-                inputProps: {
-                  className: styles.largeInput,
-                },
-              }}
               className={styles.largeNumber}
               type="number"
               variant="filled"
@@ -102,65 +113,37 @@ export default function ReviewScreen() {
               size="large"
               className={styles.largeButton}
             >
-              {orderItems.find((x) => x.name === item.name)
-                ? 'Sterge din comanda'
-                : 'Anuleaza'}
+              {orderItems.find((x) => x.name === item.name) ? 'Sterge din comanda' : 'Anuleaza'}
             </Button>
             <Button
               onClick={addToOrderHandler}
               variant="contained"
-              color="primary"
+              color="secondary"
               size="large"
               className={styles.largeButton}
             >
-              Adauga la comanda
+              Actualizeaza comanda
             </Button>
           </Box>
         </Dialog>
-        <Box className={[styles.center, styles.column].join(' ')}>
-          <Logo large></Logo>
-          <Typography
-            gutterBottom
-            className={styles.title}
-            variant="h3"
-            component="h3"
-          >
-            Comanda dumneavoastra 
-          </Typography>
-        </Box>
+
         <Grid container>
           {orderItems.map((orderItem) => (
             <Grid item md={12} key={orderItem.name}>
-              <Card
-                className={styles.card}
-                onClick={() => itemClickHandler(orderItem)}
-              >
+              <Card className={styles.card} onClick={() => itemClickHandler(orderItem)}>
                 <CardActionArea>
                   <CardContent>
                     <Box className={[styles.row, styles.between].join(' ')}>
-                      <Typography
-                        gutterBottom
-                        variant="body2"
-                        color="textPrimary"
-                        component="p"
-                      >
+                      <Typography gutterBottom variant="body2" color="textPrimary" component="p">
                         {orderItem.name}
                       </Typography>
                       <Button variant="contained">Editeaza</Button>
                     </Box>
                     <Box className={[styles.row, styles.between].join(' ')}>
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        component="p"
-                      >
+                      <Typography variant="body2" color="textSecondary" component="p">
                         {orderItem.calorie} Cal
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        color="textPrimary"
-                        component="p"
-                      >
+                      <Typography variant="body2" color="textPrimary" component="p">
                         {orderItem.quantity} x {orderItem.price} lei
                       </Typography>
                     </Box>
@@ -171,10 +154,11 @@ export default function ReviewScreen() {
           ))}
         </Grid>
       </Box>
+
       <Box>
         <Box>
           <Box className={[styles.bordered, styles.space].join(' ')}>
-            Comanda dumneavoastra -  | TVA: {taxPrice} lei | Total: {totalPrice} lei | Articole: {itemsCount} | 
+            Comanda dumneavoastră - TVA: {taxPrice} lei | Total: {totalPrice} lei | Articole: {itemsCount}😊
           </Box>
           <Box className={[styles.row, styles.around].join(' ')}>
             <Button
@@ -192,7 +176,7 @@ export default function ReviewScreen() {
               disabled={orderItems.length === 0}
               className={styles.largeButton}
             >
-              Finalizează cumpărăturile
+              Finalizează
             </Button>
           </Box>
         </Box>

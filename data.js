@@ -1,15 +1,5 @@
 const data = {
-  categories: [
-    {
-      name: 'Beverages',
-      image: '/images/beverages.jpg',
-    },
-    {
-      name: 'Breakfast',
-      image: '/images/breakfast.jpg',
-    },
-   
-  ],
+  
   products: [
     {
       category: 'Beverages',

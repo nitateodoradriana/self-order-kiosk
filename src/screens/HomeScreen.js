@@ -12,7 +12,7 @@ export default function HomeScreen(props) {
         <Box className={[styles.root, styles.red].join(' ')}>
           <Box className={[styles.main, styles.center].join(' ')}>
             <Typography component="h6" variant="h6">
-              Repede & Usor 
+              Repede & Usor ☕
             </Typography>
             <Typography component="h1" variant="h1">
               Comanda <br /> & plateste <br /> aici

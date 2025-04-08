@@ -5,10 +5,10 @@ const dotenv = require('dotenv');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
-const NFC = require('nfc-pcsc').NFC;
+const { NFC } = require('nfc-pcsc');
 
 dotenv.config();
-console.log('server is: ', process.env.MONGODB_URI);
+console.log('Server is: ', process.env.MONGODB_URI);
 
 const app = express();
 
@@ -20,50 +20,56 @@ app.use(express.urlencoded({ extended: true }));
 // Conectare la MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useCreateIndex: true,
   useUnifiedTopology: true,
+  useFindAndModify: false,
 });
 
-const Product = mongoose.model(
-  'Product',
-  new mongoose.Schema({
-    name: String,
-    description: String,
-    image: String,
-    price: Number,
-    calorie: Number,
-    category: String,
-  })
-);
+const Product = mongoose.model('Product', new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String,
+  price: Number,
+  calorie: Number,
+  category: String,
+}));
 
-const Order = mongoose.model(
-  'Order',
-  new mongoose.Schema(
-    {
-      number: { type: Number, default: 0 },
-      orderType: String,
-      paymentType: String,
-      isPaid: { type: Boolean, default: false },
-      isReady: { type: Boolean, default: false },
-      inProgress: { type: Boolean, default: true },
-      isCanceled: { type: Boolean, default: false },
-      isDelivered: { type: Boolean, default: false },
-      itemsPrice: Number,
-      taxPrice: Number,
-      totalPrice: Number,
-      orderItems: [
-        {
-          name: String,
-          price: Number,
-          quantity: Number,
-        },
-      ],
-    },
-    {
-      timestamps: true,
-    }
-  )
-);
+const Order = mongoose.model('Order', new mongoose.Schema({
+  number: { type: Number, default: 0 },
+  paid: { type: String, default: null },
+  isReady: { type: Boolean, default: false },
+  inProgress: { type: Boolean, default: true },
+  isCanceled: { type: Boolean, default: false },
+  isDelivered: { type: Boolean, default: false },
+  itemsPrice: Number,
+  taxPrice: Number,
+  totalPrice: Number,
+  orderItems: [{
+    name: String,
+    price: Number,
+    quantity: Number,
+  }],
+}, { timestamps: true }));
+
+
+const Counter = mongoose.model('Counter', new mongoose.Schema({
+  _id: String,
+  sequence_value: { type: Number, default: 0 }
+}));
+
+async function initializeCounter() {
+  try {
+    await Counter.findByIdAndUpdate(
+      'orderNumber',
+      { $setOnInsert: { sequence_value: 0 } },
+      { upsert: true, new: true }
+    );
+    console.log('Counter initialized');
+  } catch (error) {
+    console.error('Error initializing counter:', error);
+  }
+}
+
+initializeCounter();
 
 // Endpoint-uri API
 app.get('/api/products', async (req, res) => {
@@ -116,34 +122,41 @@ app.put('/api/orders/:id', async (req, res) => {
     res.status(500).send({ message: 'Error updating order' });
   }
 });
-
 app.post('/api/orders', async (req, res) => {
+  console.log('Received order data:', req.body);
   try {
-    const lastOrder = await Order.find().sort({ number: -1 }).limit(1);
-    const lastNumber = lastOrder.length === 0 ? 0 : lastOrder[0].number;
-    if (
-      !req.body.orderType ||
-      !req.body.paymentType ||
-      !req.body.orderItems ||
-      req.body.orderItems.length === 0
-    ) {
-      return res.status(400).send({ message: 'Data is required.' });
+    // Increment the order number atomically
+    const counter = await Counter.findByIdAndUpdate(
+      'orderNumber',
+      { $inc: { sequence_value: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const orderNumber = counter.sequence_value;
+    const requiredFields = ['orderItems', 'totalPrice', 'taxPrice'];
+    const missingFields = requiredFields.filter(field => !req.body[field] || (Array.isArray(req.body[field]) && req.body[field].length === 0));
+
+    if (missingFields.length > 0) {
+      return res.status(400).send({ message: `Order data is incomplete. Missing fields: ${missingFields.join(', ')}` });
     }
-    const order = await new Order({ ...req.body, number: lastNumber + 1 }).save();
+
+    const order = await new Order({ 
+      ...req.body, 
+      number: orderNumber, 
+      paid: req.body.paid || null
+    }).save();
+
     res.json(order);
   } catch (error) {
+    console.error('Error creating order:', error);
     res.status(500).send({ message: 'Error creating order' });
   }
 });
 
 
-app.get('/api/latest-nfc-data', (req, res) => {
-  res.json({ latestNfcData });
-});
 
 // Servește frontend-ul React
 app.use(express.static(path.join(__dirname, '/build')));
-
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/build/index.html'));
 });
@@ -158,13 +171,13 @@ const io = socketIo(server, {
 });
 
 const nfc = new NFC();
-let latestNfcData = null;
+
 
 nfc.on('reader', reader => {
   console.log(`Reader detected: ${reader.name}`);
 
   reader.on('card', card => {
-    latestNfcData = card.uid;
+    
     io.emit('nfc-card', card.uid);
     console.log(`Card detected: ${card.uid}`);
   });
@@ -185,5 +198,5 @@ nfc.on('error', err => {
 const port = process.env.PORT || 5000;
 
 server.listen(port, () => {
-  console.log(`Serverul HTTP rulează pe http://localhost:${port}`);
+  console.log(`HTTP server running on http://localhost:${port}`);
 });

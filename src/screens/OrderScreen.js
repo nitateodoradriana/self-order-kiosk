@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-  Avatar,
   Box,
   Button,
   Card,
@@ -11,32 +10,29 @@ import {
   Dialog,
   DialogTitle,
   Grid,
-  List,
-  ListItem,
-  TextField,
   Typography,
+  TextField,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { Store } from '../Store';
-import { addToOrder, listCategories, listProducts, removeFromOrder } from '../actions';
-import Logo from '../components/Logo';
+import { addToOrder, listProducts, removeFromOrder } from '../actions';
 import { useStyles } from '../styles';
 import classNames from 'classnames';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import Logo from '../components/Logo';
+import { ORDER_CLEAR } from '../constants';
 
-export default function OrderScreen() {
+export default function OrderScreen(props) {
   const styles = useStyles();
-  const navigate = useNavigate();
-  const [categoryName, setCategoryName] = useState('');
+  const navigate = useHistory();
   const [quantity, setQuantity] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [product, setProduct] = useState({});
   const [currentDrinkIndex, setCurrentDrinkIndex] = useState(0);
 
   const { state, dispatch } = useContext(Store);
-  const { categories = [], loading, error } = state.categoryList;
   const { products = [], loading: loadingProducts, error: errorProducts } = state.productList;
   const { orderItems, itemsCount, totalPrice, taxPrice } = state.order;
 
@@ -62,25 +58,18 @@ export default function OrderScreen() {
   };
 
   useEffect(() => {
-    if (!categories.length) {
-      listCategories(dispatch);
-    }
-  }, [dispatch, categories.length]);
-
-  useEffect(() => {
-    if (categories.length) {
-      listProducts(dispatch, categoryName);
-    }
-  }, [dispatch, categoryName, categories.length]);
-
-  const categoryClickHandler = (name) => {
-    setCategoryName(name);
-    listProducts(dispatch, name);
-  };
+    listProducts(dispatch, '');
+  }, [dispatch]);
 
   const finalizeOrderHandler = () => {
     dispatch({ type: 'ORDER_CREATE_SUCCESS', payload: state.order });
-    navigate('/review');
+    props.history.push(`/review`);
+  };
+
+  // Handler pentru butonul Înapoi
+  const handleBack = () => {
+    dispatch({ type: ORDER_CLEAR }); // Curăță comanda
+    navigate.push('/'); // Navighează înapoi la homepage
   };
 
   return (
@@ -133,7 +122,7 @@ export default function OrderScreen() {
           <Button
             onClick={addToOrderHandler}
             variant="contained"
-            color="primary"
+            color="secondary"
             size="large"
             className={styles.largeButton}
           >
@@ -142,72 +131,51 @@ export default function OrderScreen() {
         </Box>
       </Dialog>
       <Box className={styles.main}>
-        <Grid container>
-          <Grid item md={2}>
-            <List>
-              {loading ? (
-                <CircularProgress />
-              ) : error ? (
-                <Alert severity="error">{error}</Alert>
-              ) : (
-                <>
-                  <ListItem onClick={() => categoryClickHandler('')} button>
-                    <Logo />
-                  </ListItem>
-                  {Array.isArray(categories) && categories.map((category) => (
-                    <ListItem button key={category.name} onClick={() => categoryClickHandler(category.name)}>
-                      <Avatar alt={category.name} src={category.image} />
-                    </ListItem>
-                  ))}
-                </>
-              )}
-            </List>
-          </Grid>
-          <Grid item md={10}>
-            <Typography gutterBottom className={styles.title} variant="h2" component="h2">
-              {categoryName || 'Meniul Principal'}
-            </Typography>
-            <Grid container spacing={1}>
-              {loadingProducts ? (
-                <CircularProgress />
-              ) : errorProducts ? (
-                <Alert severity="error">{errorProducts}</Alert>
-              ) : (
-                Array.isArray(products) && products.map((product) => (
-                  <Grid item md={6} key={product.name}>
-                    <Card className={styles.card} onClick={() => productClickHandler(product)}>
-                      <CardActionArea>
-                        <CardMedia component="img" alt={product.name} image={product.image} className={styles.media} />
-                      </CardActionArea>
-                      <CardContent>
-                        <Typography gutterBottom variant="body2" color="textPrimary" component="p">
-                          {product.name}
-                        </Typography>
-                        <Box className={styles.cardFooter}>
-                          <Typography variant="body2" color="textSecondary" component="p">
-                            {product.calorie} Cal
-                          </Typography>
-                          <Typography variant="body2" color="textPrimary" component="p">
-                            {product.price} lei
-                          </Typography>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))
-              )}
-            </Grid>
-          </Grid>
+        <Box className={styles.logoWithTitle}>
+          <Logo className={styles.logo} />
+          <Typography gutterBottom className={styles.title} variant="h2" component="h2">
+            Meniul Principal
+          </Typography>
+        </Box>
+        <Grid container spacing={0}>
+          {loadingProducts ? (
+            <CircularProgress />
+          ) : errorProducts ? (
+            <Alert severity="error">{errorProducts}</Alert>
+          ) : (
+            Array.isArray(products) && products.map((product) => (
+              <Grid item md={6} key={product.name}>
+                <Card className={styles.card} onClick={() => productClickHandler(product)}>
+                  <CardActionArea>
+                    <CardMedia component="img" alt={product.name} image={product.image} className={styles.media} />
+                  </CardActionArea>
+                  <CardContent>
+                    <Typography gutterBottom variant="body2" color="textPrimary" component="p">
+                      {product.name}
+                    </Typography>
+                    <Box className={styles.cardFooter}>
+                      <Typography variant="body2" color="textSecondary" component="p">
+                        {product.calorie} Cal
+                      </Typography>
+                      <Typography variant="body2" color="textPrimary" component="p">
+                        {product.price} lei
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          )}
         </Grid>
       </Box>
       <Box>
         <Box>
           <Box className={classNames(styles.bordered, styles.space)}>
-            Comanda dumneavoastră | TVA: {taxPrice} lei | Total: {totalPrice} lei | Articole: {itemsCount} |
+            Comanda dumneavoastră - TVA: {taxPrice} lei | Total: {totalPrice} lei | Articole: {itemsCount}😊
           </Box>
           <Box className={classNames(styles.row, styles.around)}>
             <Button
-              onClick={() => navigate('/')}
+              onClick={handleBack} // Folosește handler-ul definit
               variant="contained"
               color="primary"
               className={styles.largeButton}
@@ -217,7 +185,7 @@ export default function OrderScreen() {
             <Button
               onClick={finalizeOrderHandler}
               variant="contained"
-              color="primary"
+              color="secondary"
               className={styles.largeButton}
               disabled={orderItems.length === 0}
             >

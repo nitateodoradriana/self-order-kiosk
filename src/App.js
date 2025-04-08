@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Container, createTheme, CssBaseline, Paper, ThemeProvider } from '@material-ui/core';
 import AdminScreen from './screens/AdminScreen';
-
+import PlaceCupScreen from './screens/PlaceCupScreen';
 import CompleteOrderScreen from './screens/CompleteOrderScreen';
 import HomeScreen from './screens/HomeScreen';
 import OrderScreen from './screens/OrderScreen';
@@ -51,7 +51,10 @@ function App() {
                 <Route path="/" component={HomeScreen} exact />
                 <Route path="/order" component={OrderScreen} exact />
                 <Route path="/review" component={ReviewScreen} exact />
+               
                 <Route path="/payment" component={PaymentScreen} />
+               
+                <Route path="/place-cup" component={PlaceCupScreen} /> 
                 <Route path="/drink-preparation" component={DrinkPreparation} />
                 <Route path="/complete" component={CompleteOrderScreen} />
                 <Route path="/admin" component={AdminScreen} />

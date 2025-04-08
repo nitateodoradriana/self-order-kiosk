@@ -3,37 +3,54 @@ import { Store } from '../Store';
 import './DrinkPreparation.css';
 import spinner from '../imagess/spinner.gif';
 import checkmark from '../imagess/checkmark.gif';
+import { useHistory } from 'react-router-dom';
 
-const DrinkPreparation = (props) => {
+const DrinkPreparation = () => {
   const [isReady, setIsReady] = useState(false);
   const { state, dispatch } = useContext(Store);
+  const history = useHistory();
   const { orderItems, currentDrinkIndex } = state.order;
-  const currentDrink = orderItems[currentDrinkIndex] || {}; // Default to empty object
+  const currentDrink = orderItems[currentDrinkIndex] || {};
 
   useEffect(() => {
+    console.log('Order Items:', orderItems);
+    console.log('Current Drink Index:', currentDrinkIndex);
+
     if (orderItems.length === 0 || currentDrinkIndex >= orderItems.length) {
+      console.log('No drinks to prepare or index out of bounds. Redirecting to /complete.');
       dispatch({ type: 'ORDER_PREPARE_COMPLETE' });
-      props.history.push('/complete');
+      history.push('/complete');
       return;
     }
 
     setIsReady(false);
-    const timer = setTimeout(() => {
+    const preparationTimer = setTimeout(() => {
       setIsReady(true);
     }, 3000);
 
-    return () => clearTimeout(timer);
-  }, [currentDrinkIndex, orderItems, dispatch, props.history]);
+    return () => {
+      clearTimeout(preparationTimer);
+    };
+  }, [currentDrinkIndex, orderItems, dispatch, history]);
 
   useEffect(() => {
     if (isReady) {
       const redirectTimer = setTimeout(() => {
+        console.log('Dispatching ORDER_PREPARE_NEXT');
         dispatch({ type: 'ORDER_PREPARE_NEXT' });
-      }, 6000);
 
-      return () => clearTimeout(redirectTimer);
+        if (state.order.allDrinksPrepared) {
+          history.push('/complete');
+        } else {
+          history.push('/place-cup');
+        }
+      }, 2000);
+
+      return () => {
+        clearTimeout(redirectTimer);
+      };
     }
-  }, [isReady, dispatch]);
+  }, [isReady, dispatch, history, state.order.allDrinksPrepared]);
 
   return (
     <div className="drink-preparation-container">
@@ -41,9 +58,9 @@ const DrinkPreparation = (props) => {
         {currentDrink && (
           <div className="preparing-text">
             {isReady ? (
-              `Savurați: ${currentDrink.name} (${(currentDrink.quantityPrepared || 0) + 1}/${currentDrink.quantity || 0})`
+              `Savurați: ${currentDrink.name} (${currentDrink.quantityPrepared + 1}/${currentDrink.quantity})`
             ) : (
-              `În pregătire: ${currentDrink.name} (${(currentDrink.quantityPrepared || 0) + 1}/${currentDrink.quantity || 0})...`
+              `În pregătire: ${currentDrink.name} (${currentDrink.quantityPrepared + 1}/${currentDrink.quantity})...`
             )}
           </div>
         )}
@@ -56,6 +73,5 @@ const DrinkPreparation = (props) => {
     </div>
   );
 };
-
 
 export default DrinkPreparation;

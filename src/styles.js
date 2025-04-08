@@ -5,12 +5,22 @@ export const useStyles = makeStyles((theme) => ({
     height: '100vh',
     display: 'flex',
     flexDirection: 'column',
+    overflowX: 'hidden',
+    overflowY: 'auto',
   },
   navy: {
-    backgroundColor: '#003080',
+    backgroundColor: '#743603',
+  },
+  top: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing(2),
+    marginTop: theme.spacing(2), 
   },
   red: {
-    backgroundColor: '#003080',
+    backgroundColor: '#743603',
     color: '#ffffff',
   },
   main: {
@@ -30,27 +40,47 @@ export const useStyles = makeStyles((theme) => ({
   green: {
     backgroundColor: '#ffffff',
   },
+  green1: {
+    backgroundColor: '#5ced73',
+  },
   largeLogo: {
     height: 100,
   },
   logo: {
     height: 50,
+    marginRight: theme.spacing(2),
   },
   cards: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  card: { margin: 10 },
+  card: {
+    margin: 10,
+    maxWidth: '100%',
+  },
   title: {
-    marginTop: 18,
+    marginTop: 12,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoWithTitle: {
+    display: 'flex',
+    alignItems: 'top',
+    marginTop: theme.spacing(2),
   },
   space: {
     padding: 10,
   },
-  media: { width: 200 },
+  media: {
+    width: 200,
+  },
   largeButton: {
-    width: 250,
+    width: '250px',
+    height: '40px',
+    padding: '8px 16px',
+    fontSize: '16px',
   },
   largeInput: {
     width: '60px!important',
@@ -74,5 +104,42 @@ export const useStyles = makeStyles((theme) => ({
   between: {
     justifyContent: 'space-between',
   },
-  column: { flexDirection: 'column' },
+  column: {
+    flexDirection: 'column',
+  },
+  PlaceCupScreen: {
+    backgroundImage: `url('../imagess/coffee-cup.jpg')`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    height: '100vh',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexDirection: 'column',
+    textAlign: 'center-bottom',
+    color: '#ffffff',
+  },
+  placeCupText: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: theme.spacing(3),
+    borderRadius: theme.spacing(2),
+    fontSize: '1.3rem',
+    fontWeight: 'italic',
+  },
+  emojiContainer: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    pointerEvents: 'none',
+  },
+  emojiButton: {
+    position: 'absolute',
+    fontSize: '2rem',
+    color: '#ff1744',
+    pointerEvents: 'auto',
+  },
+  emoji: {
+    display: 'inline-block',
+    fontSize: '2rem',
+  },
 }));
